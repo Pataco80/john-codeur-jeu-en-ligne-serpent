@@ -8,7 +8,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
         delay = 200, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
-        meal; // Nom de ma pomme pour ne pas mélanger apple et applee
+        meal, // Nom de ma pomme pour ne pas mélanger apple et applee
+        widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
+        heightInBlock = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
+
 
     // INITIALISATION
     init(); // Initialisation du canvas et des éléments situés à l'intérieur (serpent, pomme)
@@ -40,11 +43,20 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
     // RAFRAICHISSEMENT DU CANVAS
     function refrechCanvas() {
-        ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
-        crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
         crocky.advence(); // On initialise la fonction qui fait avancer le serpent
-        meal.draw(); // On initialise la fonction qui dessine la pomme
-        setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
+
+        // On met une condition pour savoir si il y a collision du serpent.
+        if (crocky.checkCollision()) {
+            // Si oui, game Over
+        }
+        // Si non, effectue le reste de rafraichissement du canvas
+        else {
+            ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
+            crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
+            meal.draw(); // On initialise la fonction qui dessine la pomme
+            setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
+        }
+
     }
 
     // DESSIN DES BLOCS DU SERPENT (crocky)
@@ -122,7 +134,36 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             }
         };
 
+        // fonction check de collision canvas ou serpent
+        this.checkCollision = function() {
+            var wallCollision = false; // Variable collision canvas initialisée à false = jeu continue
+            var snakeCollision = false; // Variable collision canvas initialisée à false = jeu continue
+            var head = this.body[0]; // Variable valeur 0 du array de "crocky" = tête du serpent
+            var rest = this.body.slice(1); // Variable contenant le corp du serpent 
+            var snakeX = head[0]; // Valleur du bloc sur l'axe x dans le array de "crocky"
+            var snakeY = head[1]; // Valleur du bloc sur l'axe x dans le array de "crocky"
+            var minX = 0; // On indique la limite de la bordure gauche du canvas
+            var minY = 0; // On indique la limite de la bordure du haut du canvas
+            var maxX = widthInBlock - 1; //On indique la limite du bordure droite du canvas
+            var maxY = widthInBlock - 1; //On indique la limite du bordure du bas du canvas
+            var isNotBeetweenHorizontalWalls = snakeX < minX || snakeX > maxX; // On indique les limites horizontalles à ne pas dépasser
+            var isNotBeetweenVerticalWalls = snakeY < minY || snakeY > maxY; // On indique les limites verticales à ne pas dépasser
 
+            //On conditionne le comportement du serpent en cas de collision du canvas
+            if (isNotBeetweenHorizontalWalls || isNotBeetweenVerticalWalls) {
+                wallCollision = true; // La collision fait passer à true ce qui engendre l'arret du jeu
+            }
+
+            // On parcoure le tableau pour verifier si la tête touche le corp de crocky
+            for (var i = 0; i < rest.length; i++) {
+                // Si l'emplacement de la tête est égale au reste du corp
+                if (snakeX === rest[i][0] && snakeY === rest[i][1]) {
+                    snakeCollision = true; // Il y a collision du serpent sur lui même
+                }
+            }
+            return wallCollision || snakeCollision;
+
+        };
     }
 
     // CONSTRUCTION LA POMME (Objet)
