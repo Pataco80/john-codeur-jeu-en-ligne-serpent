@@ -7,7 +7,8 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         blockSize = 30, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
         delay = 200, // Temps de rafraichissement du canvas et de son contenu.
-        crocky; //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
+        crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
+        meal; // Nom de ma pomme pour ne pas mélanger apple et applee
 
     // INITIALISATION
     init(); // Initialisation du canvas et des éléments situés à l'intérieur (serpent, pomme)
@@ -31,6 +32,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             [5, 4],
             [4, 4]
         ], "right"); // On indique la direction initiale du serpent
+
+        // On crée la pomme en tant qu'objet
+        meal = new apple([10, 10]);
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
@@ -39,6 +43,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
         crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
         crocky.advence(); // On initialise la fonction qui fait avancer le serpent
+        meal.draw(); // On initialise la fonction qui dessine la pomme
         setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
     }
 
@@ -62,7 +67,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             for (var i = 0; i < this.body.length; i++) {
                 drawBlock(ctx, this.body[i]); // On indique le résultat de la longueur du serpent dans le canvas 
             }
-            ctx.restore(); // On restore le serpent à son nouvel emplacement
+            ctx.restore(); // On restore l'état du serpent
 
         };
 
@@ -115,6 +120,25 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             if (allowedDirections.indexOf(newDirection) > -1) {
                 this.direction = newDirection; // Atribue à la variable direction du serpent la nouvelle direction à prendre
             }
+        };
+
+
+    }
+
+    // CONSTRUCTION LA POMME (Objet)
+    function apple(position) {
+        this.position = position;
+        this.draw = function() {
+            ctx.save(); // On commance par suvgarder son état
+            ctx.fillStyle = "#33cc33"; // On attribue une couleur à l'objet dessiné
+            ctx.beginPath();
+            var radius = blockSize / 2; // Rayon de la pomme
+            var x = position[0] * blockSize + radius; // Position x du rond en prenant le coin en haut et ajout de 15px
+            var y = position[1] * blockSize + radius; // Position y du rond en prenant le coin en haut et ajout de 15px
+            ctx.arc(x, y, radius, 0, Math.PI * 2, true); // Dessin du cercle
+            ctx.fill(); // Remplissage du cercle
+            ctx.restore(); // On restore l'état de la pomme
+
         };
     }
 
