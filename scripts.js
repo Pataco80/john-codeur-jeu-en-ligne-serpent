@@ -20,12 +20,17 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         document.body.appendChild(canvas); // On demande au document d'attacher l'élément canvas comme dernier élément enfant du body
         ctx = canvas.getContext("2d"); // On indique que le contexte de travail sera en 2d, donc axes x et y seulement.
 
-        // Taille initiale de mon serpent de 3 blocs de 30 px chacun. Mentionnés dans l'ordre de la tête au pieds introduit dans le canvas comme un objet.
+
+        /* On crée un tableau représentant le serpent avec 3 sous-tableau de 2 valeurs chacun.
+        Une valeur à 0 servant à s'alligner sur l'axe x et la 2ème sur l'axe y de chaque bloc du serpent
+        
+        Taille initiale de mon serpent de 3 blocs de 30 px chacun. 
+        Mentionnés dans l'ordre de la tête au pieds introduit dans le canvas comme un objet.*/
         crocky = new snake([
             [6, 4],
             [5, 4],
             [4, 4]
-        ]);
+        ], "right"); // On indique la direction initiale du serpent
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
@@ -45,9 +50,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
     }
 
     // CONSTRUCTION DU SERPENT (Objet)
-    function snake(body) {
+    function snake(body, direction) {
         this.body = body; // On sible le body du serpent
-
+        this.direction = direction; // On sible la direction du serpent
         // On crée le dessin du serpent
         this.draw = function() {
             ctx.save(); // On commance par suvgarder son état
@@ -61,13 +66,81 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         };
 
-        // On crée la fonction faisant avancer le serpent
+        // ON FAIT AVANCER LE SERPENT
         this.advence = function() {
             var nextPosition = this.body[0].slice(); // On copie le premier bloc du array du serpent sur l'axe x
-            nextPosition[0] += 1; // On ajoute un bloc de plus au serpent (il fait 4 blocs maintenant, mais ne se voit pas encore)
+            // On crée une boucle (switch) pur attribuer des valeurs x et y suivant la direction prise par le serpent
+            switch (this.direction) {
+                case "left":
+                    nextPosition[0] -= 1; // On soustrait un bloc sur l'axe x lorsqu'il va à gauche
+                    break;
+                case "right":
+                    nextPosition[0] += 1; // On ajoute un bloc sur l'axe x lorsqu'il va à droite
+                    break;
+                case "up":
+                    nextPosition[1] -= 1; // On soustrait un bloc sur l'axe y lorsqu'il va en haut
+                    break;
+                case "down":
+                    nextPosition[1] += 1; // On ajoute un bloc sur l'axe y lorsqu'il va en bas
+                    break;
+                default:
+                    throw ("Invalid Direction");
+            }
             this.body.unshift(nextPosition); // On cole le nouveau bloc devant le premier et on le voit maintenant 4 blocs
             this.body.pop(); // On efface la dernière ocurance de l'array. Le serpent fait de nouveau 3 blocs mais décalés d'un cran sur l'axe x
         };
+
+        // Directions autorisées
+        this.setDirection = function(newDirection) {
+            var allowedDirections; // Variable où sera stockée les valeurs de direction autorisées
+            // On fait une boucle sur les touches appuyées et on examine si c'est autorisé
+            switch (this.direction) {
+                case "left":
+                case "right":
+                    allowedDirections = ["up", "down"]; // Si le serpent se dirige à gauche ou à droite, on l'autorise à monter ou descendre
+                    break;
+                case "up":
+                case "down":
+                    allowedDirections = ["left", "right"]; // Si le serpent se dirige en haut ou en bas, on l'autorise à aller à gauche ou à droite
+                    break;
+                default:
+                    throw ("Invalid allowDirection");
+
+            }
+
+            // On met une condition pour atribuer à la direction du serpent, la nouvelle direction à prendre, soit, la nouvelle direction
+            /* Cette condition va vérifier la valeurdu tableau de "allowedDirection"
+            en vérifiant si la touche enfoncée correspond à la valeur 0 ou 1 du tableau dans le switch(this.direction)
+            ci-dessus */
+            if (allowedDirections.indexOf(newDirection) > -1) {
+                this.direction = newDirection; // Atribue à la variable direction du serpent la nouvelle direction à prendre
+            }
+        };
     }
+
+    // A LA PRESSION DES TOUCHES
+    document.onkeydown = function handleKeyDown(e) {
+        var key = e.keyCode; // Variable stockant le code de référance de la touche enfoncée lors de l'évènement onkeydown
+        var newDirection; // Variable dans laquelle sera stockée la nouvelle valeur suivant la touche enfoncée.
+
+        // On fait une boucle pour passer en revue les références des touches et la valeur à atribuer à la newDirection
+        switch (key) {
+            case 37:
+                newDirection = "left";
+                break;
+            case 38:
+                newDirection = "up";
+                break;
+            case 39:
+                newDirection = "right";
+                break;
+            case 40:
+                newDirection = "down";
+                break;
+            default:
+                return;
+        }
+        crocky.setDirection(newDirection); // On atribue à l'objet crocky la nouvelle direction à prendre
+    };
 
 };
