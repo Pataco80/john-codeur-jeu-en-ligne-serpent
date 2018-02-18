@@ -16,12 +16,16 @@ window.onload = function() {
         document.body.appendChild(canvas);
 
         ctx = canvas.getContext("2d");
-        ctx.fillStyle = "#ff0000";
-        ctx.fillRect(xCoord, yCoord, 100, 50);
+        refrechCanvas();
     }
 
     function refrechCanvas() {
-
+        xCoord += 2;
+        yCoord += 2;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#ff0000";
+        ctx.fillRect(xCoord, yCoord, 100, 50);
+        setTimeout(refrechCanvas, delay);
     }
 
 };
