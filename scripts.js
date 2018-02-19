@@ -31,9 +31,16 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         Taille initiale de mon serpent de 3 blocs de 30 px chacun. 
         Mentionnés dans l'ordre de la tête au pieds introduit dans le canvas comme un objet.*/
         crocky = new snake([
+            [9, 4],
+            [8, 4],
+            [7, 4],
             [6, 4],
             [5, 4],
-            [4, 4]
+            [4, 4],
+            [3, 4],
+            [2, 4],
+            [1, 4],
+            [0, 4]
         ], "right"); // On indique la direction initiale du serpent
 
         // On crée la pomme en tant qu'objet
@@ -188,7 +195,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         var key = e.keyCode; // Variable stockant le code de référance de la touche enfoncée lors de l'évènement onkeydown
         var newDirection; // Variable dans laquelle sera stockée la nouvelle valeur suivant la touche enfoncée.
 
-        // On fait une boucle pour passer en revue les références des touches et la valeur à atribuer à la newDirection
+        // On fait une boucle pour passer la valeur des touches à la newDirection
         switch (key) {
             case 37:
                 newDirection = "left";
