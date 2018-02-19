@@ -48,7 +48,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         // On met une condition pour savoir si il y a collision du serpent.
         if (crocky.checkCollision()) {
-            // Si oui, game Over
+            gameOver(); // Si oui, game Over
         }
         // Si non, le jeu continue
         else {
@@ -68,6 +68,13 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
         }
 
+    }
+
+    function gameOver() {
+        ctx.save();
+        ctx.fillText("Game Over", 5, 15);
+        ctx.fillText("Appuillez sur la touche espace pour rejouer", 5, 30);
+        ctx.restore();
     }
 
     // DESSIN DES BLOCS DU SERPENT (crocky)
