@@ -77,6 +77,20 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         ctx.restore();
     }
 
+    function restart() {
+        crocky = new snake([
+            [6, 4],
+            [5, 4],
+            [4, 4],
+            [3, 4],
+            [2, 4]
+        ], "right"); // On indique la direction initiale du serpent
+
+        // On crée la pomme en tant qu'objet
+        meal = new apple([10, 10]);
+        refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
+    }
+
     // DESSIN DES BLOCS DU SERPENT (crocky)
     function drawBlock(ctx, position) {
         var x = position[0] * blockSize; // Taille d'un bloc par rapport à l'axe x
@@ -252,6 +266,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             case 40:
                 newDirection = "down";
                 break;
+            case 32:
+                restart();
+                return;
             default:
                 return;
         }
