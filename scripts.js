@@ -1,8 +1,7 @@
 window.onload = function() { // Dès le chargement de la page, ont demande les instructions suivantes...
 
     // VARIABLES GLOBALES
-    var canvas, // Variable représentant le canvas
-        canvasWidth = 900, // largeur en px du canvas
+    var canvasWidth = 900, // largeur en px du canvas
         canvasHeight = 600, // hauteur en px du canvas
         blockSize = 30, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
@@ -10,14 +9,14 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
-        heightInBlock = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
+        heightInBlocks = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
 
 
     // INITIALISATION
     init(); // Initialisation du canvas et des éléments situés à l'intérieur (serpent, pomme)
 
     function init() {
-        canvas = this.document.createElement("canvas"); // On demande au document de créer le canvas
+        var canvas = document.createElement("canvas"); // On demande au document de créer le canvas
         canvas.width = canvasWidth; // Largeur du canvas (6px mentionnés à la variable ligne 5)
         canvas.height = canvasHeight; // Hauteur du canvas (6px mentionnés à la variable ligne 6)
         canvas.style.border = "1px blue solid"; // Stylisation du canvas
@@ -31,16 +30,11 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         Taille initiale de mon serpent de 3 blocs de 30 px chacun. 
         Mentionnés dans l'ordre de la tête au pieds introduit dans le canvas comme un objet.*/
         crocky = new snake([
-            [9, 4],
-            [8, 4],
-            [7, 4],
             [6, 4],
             [5, 4],
             [4, 4],
             [3, 4],
-            [2, 4],
-            [1, 4],
-            [0, 4]
+            [2, 4]
         ], "right"); // On indique la direction initiale du serpent
 
         // On crée la pomme en tant qu'objet
@@ -56,8 +50,18 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         if (crocky.checkCollision()) {
             // Si oui, game Over
         }
-        // Si non, effectue le reste de rafraichissement du canvas
+        // Si non, le jeu continue
         else {
+            // Si le serpent mange son repas
+            if (crocky.isEatingApple(meal)) {
+                crocky.ateApple = true;
+                do {
+                    meal.setNewPosition();
+                }
+                while (meal.isOnSnake(crocky));
+                // la pomme prend une nouvelle position
+
+            }
             ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
             crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
             meal.draw(); // On initialise la fonction qui dessine la pomme
@@ -77,6 +81,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
     function snake(body, direction) {
         this.body = body; // On sible le body du serpent
         this.direction = direction; // On sible la direction du serpent
+        this.ateApple = false;
         // On crée le dessin du serpent
         this.draw = function() {
             ctx.save(); // On commance par suvgarder son état
@@ -87,7 +92,6 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
                 drawBlock(ctx, this.body[i]); // On indique le résultat de la longueur du serpent dans le canvas 
             }
             ctx.restore(); // On restore l'état du serpent
-
         };
 
         // ON FAIT AVANCER LE SERPENT
@@ -111,7 +115,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
                     throw ("Invalid Direction");
             }
             this.body.unshift(nextPosition); // On cole le nouveau bloc devant le premier et on le voit maintenant 4 blocs
-            this.body.pop(); // On efface la dernière ocurance de l'array. Le serpent fait de nouveau 3 blocs mais décalés d'un cran sur l'axe x
+            if (!this.ateApple)
+                this.body.pop(); // On efface la dernière ocurance de l'array. Le serpent fait de nouveau 3 blocs mais décalés d'un cran sur l'axe x
+            else
+                this.ateApple = false;
         };
 
         // Directions autorisées
@@ -164,29 +171,58 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             // On parcoure le tableau pour verifier si la tête touche le corp de crocky
             for (var i = 0; i < rest.length; i++) {
                 // Si l'emplacement de la tête est égale au reste du corp
-                if (snakeX === rest[i][0] && snakeY === rest[i][1]) {
+                if (snakeX === rest[i][0] && snakeY === rest[i][1])
                     snakeCollision = true; // Il y a collision du serpent sur lui même
-                }
             }
             return wallCollision || snakeCollision;
 
+        };
+
+        // Si la pomme est croquée
+        this.isEatingApple = function(appleToEat) {
+            var head = this.body[0]; // La tête est égale à 0 sur l'axe X
+
+            /* Dans le cas où il n'y a qu'une instruction par ligne
+            il n'est pas nécéssaire de mettre des crochets */
+            if (head[0] === appleToEat.position[0] && head === appleToEat.position[1]) // Si la tête est absolument égale à 0 sur axe X et 1 sur axe Y
+                return true; // crocky mange la pomme
+            else
+                return false; // crocky ne mange pas la pomme
         };
     }
 
     // CONSTRUCTION LA POMME (Objet)
     function apple(position) {
         this.position = position;
-        this.draw = function() {
-            ctx.save(); // On commance par suvgarder son état
-            ctx.fillStyle = "#33cc33"; // On attribue une couleur à l'objet dessiné
-            ctx.beginPath();
-            var radius = blockSize / 2; // Rayon de la pomme
-            var x = position[0] * blockSize + radius; // Position x du rond en prenant le coin en haut et ajout de 15px
-            var y = position[1] * blockSize + radius; // Position y du rond en prenant le coin en haut et ajout de 15px
-            ctx.arc(x, y, radius, 0, Math.PI * 2, true); // Dessin du cercle
-            ctx.fill(); // Remplissage du cercle
-            ctx.restore(); // On restore l'état de la pomme
 
+        this.draw = function() {
+            ctx.save();
+            ctx.fillStyle = "#33cc33";
+            ctx.beginPath();
+            var radius = blockSize / 2;
+            var x = this.position[0] * blockSize + radius;
+            var y = this.position[1] * blockSize + radius;
+            ctx.arc(x, y, radius, 0, Math.PI * 2, true);
+            ctx.fill();
+            ctx.restore();
+        };
+
+        //On donne une nouvelle position à la pomme
+        this.setNewPosition = function() {
+            var newX = Math.round(Math.random() * (widthInBlocks - 1));
+            var newY = Math.round(Math.random() * (heightInBlocks - 1));
+            this.position = [newX, newY];
+        };
+
+
+        this.isOnSnake = function(snakeToCheck) {
+            var isOnSnake = false;
+            for (var i = 0; i < snakeToCheck.body.length; i++) {
+                if (this.position[0] === snakeToCheck.body[i][0] && this.position[1] === snakeToCheck.body[i][0]) {
+                    isOnSnake = true;
+                }
+            }
+            return isOnSnake;
         };
     }
 
