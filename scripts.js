@@ -8,6 +8,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         delay = 100, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
+        score,
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
         heightInBlocks = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
 
@@ -39,6 +40,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         // On crée la pomme en tant qu'objet
         meal = new apple([10, 10]);
+        score = 0;
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
@@ -54,6 +56,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         else {
             // Si le serpent mange son repas
             if (crocky.isEatingApple(meal)) {
+                score++;
                 crocky.ateApple = true;
                 do {
                     meal.setNewPosition();
@@ -65,6 +68,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
             crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
             meal.draw(); // On initialise la fonction qui dessine la pomme
+            drowScore();
             setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
         }
 
@@ -88,7 +92,14 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         // On crée la pomme en tant qu'objet
         meal = new apple([10, 10]);
+        score = 0;
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
+    }
+
+    function drowScore() {
+        ctx.save();
+        ctx.fillText(score.toString(), 5, canvasHeight - 5);
+        ctx.restore();
     }
 
     // DESSIN DES BLOCS DU SERPENT (crocky)
