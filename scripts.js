@@ -6,7 +6,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         canvasHeight = 600, // hauteur en px du canvas
         blockSize = 30, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
-        delay = 200, // Temps de rafraichissement du canvas et de son contenu.
+        delay = 100, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
