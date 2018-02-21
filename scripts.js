@@ -3,9 +3,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
     // VARIABLES GLOBALES
     var canvasWidth = 900, // largeur en px du canvas
         canvasHeight = 600, // hauteur en px du canvas
-        blockSize = 30, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
+        blockSize = 20, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
-        delay = 200, // Temps de rafraichissement du canvas et de son contenu.
+        delay = 150, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
         score, // On stock le score dans cette variable
