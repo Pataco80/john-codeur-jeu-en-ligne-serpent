@@ -5,10 +5,11 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         canvasHeight = 600, // hauteur en px du canvas
         blockSize = 20, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
-        delay = 150, // Temps de rafraichissement du canvas et de son contenu.
+        delay = 200, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
         score, // On stock le score dans cette variable
+        newScore = 0,
         timeOut, // On stock le timeout de rafraichissement dans cette variable
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
         heightInBlock = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
@@ -65,6 +66,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             // Si le serpent mange son repas
             if (crocky.isEatingApple(meal)) {
                 score++; // Si le serpent a mangé sa pomme, on monte le score de 1 "score++" est égal à écrire "score +=1"
+                if (score % 5 == 0) {
+                    accelerate();
+                }
                 crocky.ateApple = true;
                 do {
                     meal.setNewPosition();
@@ -73,6 +77,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
                 // la pomme prend une nouvelle position
 
             }
+
+
+
             ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
             drowScore();
             crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
@@ -82,6 +89,9 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
     }
 
+    function accelerate() {
+        delay = delay / 2;
+    }
     // Paramêtres d'affichage du Game Over
     function gameOver() {
         ctx.save(); // On sauvegarde les paramêtres
@@ -115,6 +125,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         // On recrée la pomme en tant que nouvel objet
         meal = new apple([10, 10]);
         score = 0; // On place le score à 0
+        delay = 200;
         clearTimeout(timeOut); // On supprime le timeout pour le réinitialiser à sa valeur de départ
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
@@ -319,4 +330,4 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         crocky.setDirection(newDirection); // On atribue à l'objet crocky la nouvelle direction à prendre
     };
 
-}
+};
