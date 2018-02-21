@@ -8,8 +8,8 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         delay = 200, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
-        score,
-        timeOut,
+        score, // On stock le score dans cette variable
+        timeOut, // On stock le timeout de rafraichissement dans cette variable
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
         heightInBlock = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
 
@@ -44,11 +44,15 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         // On crée la pomme en tant qu'objet
         meal = new apple([10, 10]);
-        score = 0;
+        score = 0; // On initialise le score à 0 au démarage du jeu
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
     // RAFRAICHISSEMENT DU CANVAS
+    /*Plus en bas, on voit des .save() et .restore().
+    Ils servent à sauvgarder l'état des objet et les replacer dans 
+    le contexte à l'état dans lequel l'élément était avant le rafraichissement
+    du vanvas qui à lieu tous les 10èmes de secondes.*/
     function refrechCanvas() {
         crocky.advence(); // On initialise la fonction qui fait avancer le serpent
 
@@ -60,7 +64,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         else {
             // Si le serpent mange son repas
             if (crocky.isEatingApple(meal)) {
-                score++;
+                score++; // Si le serpent a mangé sa pomme, on monte le score de 1 "score++" est égal à écrire "score +=1"
                 crocky.ateApple = true;
                 do {
                     meal.setNewPosition();
@@ -78,8 +82,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
     }
 
+    // Paramêtres d'affichage du Game Over
     function gameOver() {
-        ctx.save();
+        ctx.save(); // On sauvegarde les paramêtres
+        // paramêtres du texte Game Over
         ctx.fillStyle = "#000";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -93,9 +99,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         ctx.font = "bold 30px sans-serif";
         ctx.strokeText("Appuillez sur la touche espace pour rejouer", centerX, centerY - 120);
         ctx.fillText("Appuillez sur la touche espace pour rejouer", centerX, centerY - 120);
-        ctx.restore();
+        ctx.restore(); // On remet les paramêtres sauvgardés
     }
 
+    // A chaque fois que le jeu démare, on recrée le serpent en tant que nouvel objet
     function restart() {
         crocky = new snake([
             [6, 4],
@@ -105,15 +112,17 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             [2, 4]
         ], "right"); // On indique la direction initiale du serpent
 
-        // On crée la pomme en tant qu'objet
+        // On recrée la pomme en tant que nouvel objet
         meal = new apple([10, 10]);
-        score = 0;
-        clearTimeout(timeOut);
+        score = 0; // On place le score à 0
+        clearTimeout(timeOut); // On supprime le timeout pour le réinitialiser à sa valeur de départ
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
+    // On dessine le score
     function drowScore() {
         ctx.save();
+        // On sauvegarde les paramêtres
         ctx.font = "bold 200px sans-serif";
         ctx.fillStyle = "gray";
         ctx.textAlign = "center";
@@ -121,7 +130,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         var centerX = canvasWidth / 2;
         var centerY = canvasHeight / 2;
         ctx.fillText(score.toString(), centerX, centerY);
-        ctx.restore();
+        ctx.restore(); // On remet les paramêtres sauvgardés
     }
     // DESSIN DES BLOCS DU SERPENT (crocky)
     function drawBlock(ctx, position) {
@@ -168,10 +177,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
                     throw ("Invalid Direction");
             }
             this.body.unshift(nextPosition); // On cole le nouveau bloc devant le premier et on le voit maintenant 4 blocs
-            if (!this.ateApple)
+            if (!this.ateApple) // Si le serpent ne mange pas de pomme, on effectue un pop sur le corp
                 this.body.pop(); // On efface la dernière ocurance de l'array. Le serpent fait de nouveau 3 blocs mais décalés d'un cran sur l'axe x
             else
-                this.ateApple = false;
+                this.ateApple = false; // Si il à mangé la pomme, le corp s'allonge
         };
 
         // Directions autorisées
@@ -247,9 +256,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
     // CONSTRUCTION LA POMME (Objet)
     function apple(position) {
         this.position = position;
-
+        // On dessine la pomme 
         this.draw = function() {
-            ctx.save();
+            ctx.save(); // On commance par sauvgarder son état
+            // On donne les paramêtres d'affichage de la pomme
             ctx.fillStyle = "#33cc33";
             ctx.beginPath();
             var radius = blockSize / 2;
@@ -257,17 +267,19 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             var y = this.position[1] * blockSize + radius;
             ctx.arc(x, y, radius, 0, Math.PI * 2, true);
             ctx.fill();
-            ctx.restore();
+
+            ctx.restore(); // On réstore les paramêtres de la pomme
         };
 
         //On donne une nouvelle position à la pomme
         this.setNewPosition = function() {
-            var newX = Math.round(Math.random() * (widthInBlock - 1));
-            var newY = Math.round(Math.random() * (heightInBlock - 1));
-            this.position = [newX, newY];
+            var newX = Math.round(Math.random() * (widthInBlock - 1)); // On indique la limite sur l'axe horizontal pour éviter que la pomme sorte du canvas
+            var newY = Math.round(Math.random() * (heightInBlock - 1)); // On indique la limite sur l'axe horizontal pour éviter que la pomme sorte du canvas
+            this.position = [newX, newY]; // On attribue sa nouvelle position au paramêtre position
         };
 
 
+        // On check le serpent pour ne pas placer la pomme sur l'emplacement actuel du serpent
         this.isOnSnake = function(snakeToCheck) {
             var isOnSnake = false;
             for (var i = 0; i < snakeToCheck.body.length; i++) {
