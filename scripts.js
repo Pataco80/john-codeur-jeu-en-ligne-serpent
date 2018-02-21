@@ -5,12 +5,13 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         canvasHeight = 600, // hauteur en px du canvas
         blockSize = 30, // Dimention de la taille d'un bloc du serpent. Celui-ci est de 30px
         ctx, // Variable représentant le contexte dans lequel se trouve les eléments dessinés.
-        delay = 100, // Temps de rafraichissement du canvas et de son contenu.
+        delay = 200, // Temps de rafraichissement du canvas et de son contenu.
         crocky, //Nom de mon serpent. Je craignait de mélanger les pinceaux entre Snake et Snakee. Il croque des pomme alors crocky ;-)
         meal, // Nom de ma pomme pour ne pas mélanger apple et applee
         score,
+        timeOut,
         widthInBlock = canvasWidth / blockSize, // On calcule le nombre de blocks dans la largeur du canvas
-        heightInBlocks = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
+        heightInBlock = canvasHeight / blockSize; // On calcule le nombre de blocks dans la hauteur du canvas
 
 
     // INITIALISATION
@@ -20,7 +21,10 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         var canvas = document.createElement("canvas"); // On demande au document de créer le canvas
         canvas.width = canvasWidth; // Largeur du canvas (6px mentionnés à la variable ligne 5)
         canvas.height = canvasHeight; // Hauteur du canvas (6px mentionnés à la variable ligne 6)
-        canvas.style.border = "1px blue solid"; // Stylisation du canvas
+        canvas.style.border = "10px gray solid"; // Stylisation du canvas
+        canvas.style.margin = "50px auto";
+        canvas.style.display = "flex";
+        canvas.style.backgroundColor = "ddd";
         document.body.appendChild(canvas); // On demande au document d'attacher l'élément canvas comme dernier élément enfant du body
         ctx = canvas.getContext("2d"); // On indique que le contexte de travail sera en 2d, donc axes x et y seulement.
 
@@ -66,18 +70,29 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
             }
             ctx.clearRect(0, 0, canvasWidth, canvasHeight); // On demande d'effacer le canvas
+            drowScore();
             crocky.draw(); // On initialise la fonction qui dessine le serpent sur le canvas.
             meal.draw(); // On initialise la fonction qui dessine la pomme
-            drowScore();
-            setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
+            timeOut = setTimeout(refrechCanvas, delay); // On indique le délais d'éxecution du rafraichissement du canvas et son contenu.
         }
 
     }
 
     function gameOver() {
         ctx.save();
-        ctx.fillText("Game Over", 5, 15);
-        ctx.fillText("Appuillez sur la touche espace pour rejouer", 5, 30);
+        ctx.fillStyle = "#000";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.strokeStyle = "white";
+        ctx.lineWidth = 5;
+        var centerX = canvasWidth / 2;
+        var centerY = canvasHeight / 2;
+        ctx.font = "bold 50px sans-serif";
+        ctx.strokeText("Game Over", centerX, centerY - 180);
+        ctx.fillText("Game Over", centerX, centerY - 180);
+        ctx.font = "bold 30px sans-serif";
+        ctx.strokeText("Appuillez sur la touche espace pour rejouer", centerX, centerY - 120);
+        ctx.fillText("Appuillez sur la touche espace pour rejouer", centerX, centerY - 120);
         ctx.restore();
     }
 
@@ -93,15 +108,21 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         // On crée la pomme en tant qu'objet
         meal = new apple([10, 10]);
         score = 0;
+        clearTimeout(timeOut);
         refrechCanvas(); // Pour terminer, on demande de rafraichir le canvas.
     }
 
     function drowScore() {
         ctx.save();
-        ctx.fillText(score.toString(), 5, canvasHeight - 5);
+        ctx.font = "bold 200px sans-serif";
+        ctx.fillStyle = "gray";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        var centerX = canvasWidth / 2;
+        var centerY = canvasHeight / 2;
+        ctx.fillText(score.toString(), centerX, centerY);
         ctx.restore();
     }
-
     // DESSIN DES BLOCS DU SERPENT (crocky)
     function drawBlock(ctx, position) {
         var x = position[0] * blockSize; // Taille d'un bloc par rapport à l'axe x
@@ -191,7 +212,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
             var minX = 0; // On indique la limite de la bordure gauche du canvas
             var minY = 0; // On indique la limite de la bordure du haut du canvas
             var maxX = widthInBlock - 1; //On indique la limite du bordure droite du canvas
-            var maxY = widthInBlock - 1; //On indique la limite du bordure du bas du canvas
+            var maxY = heightInBlock - 1; //On indique la limite du bordure du bas du canvas
             var isNotBeetweenHorizontalWalls = snakeX < minX || snakeX > maxX; // On indique les limites horizontalles à ne pas dépasser
             var isNotBeetweenVerticalWalls = snakeY < minY || snakeY > maxY; // On indique les limites verticales à ne pas dépasser
 
@@ -216,7 +237,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
             /* Dans le cas où il n'y a qu'une instruction par ligne
             il n'est pas nécéssaire de mettre des crochets */
-            if (head[0] === appleToEat.position[0] && head === appleToEat.position[1]) // Si la tête est absolument égale à 0 sur axe X et 1 sur axe Y
+            if (head[0] === appleToEat.position[0] && head[1] === appleToEat.position[1]) // Si la tête est absolument égale à 0 sur axe X et 1 sur axe Y
                 return true; // crocky mange la pomme
             else
                 return false; // crocky ne mange pas la pomme
@@ -241,8 +262,8 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
 
         //On donne une nouvelle position à la pomme
         this.setNewPosition = function() {
-            var newX = Math.round(Math.random() * (widthInBlocks - 1));
-            var newY = Math.round(Math.random() * (heightInBlocks - 1));
+            var newX = Math.round(Math.random() * (widthInBlock - 1));
+            var newY = Math.round(Math.random() * (heightInBlock - 1));
             this.position = [newX, newY];
         };
 
@@ -286,4 +307,4 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
         crocky.setDirection(newDirection); // On atribue à l'objet crocky la nouvelle direction à prendre
     };
 
-};
+}
