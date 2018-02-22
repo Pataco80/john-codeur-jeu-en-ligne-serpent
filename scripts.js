@@ -90,7 +90,7 @@ window.onload = function() { // Dès le chargement de la page, ont demande les i
     }
 
     function accelerate() {
-        delay = delay / 2;
+        delay = delay - 20;
     }
     // Paramêtres d'affichage du Game Over
     function gameOver() {
